@@ -35,7 +35,7 @@
           </div>
         </el-col>
       </el-row>
-      <el-divider></el-divider>
+      <el-divider />
     </div>
     <div
       v-if="!loading"
@@ -121,7 +121,7 @@
   </div>
 </template>
 <script>
-import axios from "axios";
+import { getText } from "/src/api/content";
 
 export default {
   name: "Content",
@@ -185,14 +185,10 @@ export default {
         params.startPage = this.currentPage;
         params.endPage = this.currentPage;
       }
-      axios
-        .get("http://127.0.0.1:5000/get_text", {
-          params: params,
-        })
-        .then((resp) => {
-          this.loading = false;
-          this.content = resp.data;
-        });
+      getText(params).then((resp) => {
+        this.loading = false;
+        this.content = resp;
+      });
     },
     handleChangePage(type) {
       if (type) {
@@ -206,33 +202,21 @@ export default {
       }
       this.handleSearch();
     },
-    handleGetPages() {
-      axios
-        .get("http://127.0.0.1:5000/search_title", {
-          params: {
-            title: this.title,
-          },
-        })
-        .then((resp) => {
-          const arr = resp.data.sort((a, b) => b.pages - a.pages);
-          this.code = arr[0].page;
-          this.total = arr[0].pages;
-          for (let i = 1; i <= this.total; i++) {
-            this.menu.push({
-              id: i,
-              label: `第 ${i} 页`,
-            });
-          }
-          this.handleSearch();
-        });
-    },
     handleNodeClick(row) {
       this.$refs["page" + String(row.id - 1)][0].scrollIntoView();
     },
   },
   created() {
     this.title = this.$route.params.title;
-    this.handleGetPages();
+    this.code = this.$route.params.page;
+    this.total = this.$route.params.pages;
+    for (let i = 1; i <= this.total; i++) {
+      this.menu.push({
+        id: i,
+        label: `第 ${i} 页`,
+      });
+    }
+    this.handleSearch();
   },
 };
 </script>

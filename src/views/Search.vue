@@ -32,13 +32,7 @@
               }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            v-if="type === '文 章 搜 索'"
-            prop="pages"
-            label="页数"
-            width="230"
-          >
-          </el-table-column>
+          <el-table-column prop="pages" label="页数" width="230" />
         </el-table>
       </el-col>
     </el-row>
@@ -60,8 +54,7 @@
 </template>
 
 <script>
-import axios from "axios";
-
+import { searchTitle, searchLabel } from "/src/api/search";
 export default {
   name: "Search",
   data() {
@@ -86,6 +79,8 @@ export default {
         name: "Content",
         params: {
           title: row.title,
+          page: row.page,
+          pages: row.pages,
         },
       });
     },
@@ -108,23 +103,19 @@ export default {
           this.$store.commit("getTitleSearchData", "");
         }
         if (this.$store.state.titleSearchList.length === 0) {
-          axios
-            .get("http://127.0.0.1:5000/search_title", {
-              params: {
-                title: this.input,
-              },
-            })
-            .then((resp) => {
-              this.tableAllData = resp.data;
-              this.total = this.tableAllData.length;
-              this.currentPage = 1;
-              this.tableData = this.pages(
-                this.tableAllData,
-                this.pageSize,
-                this.currentPage - 1
-              );
-              this.$store.commit("getTitleSearchList", this.tableAllData);
-            });
+          searchTitle({
+            title: this.input,
+          }).then((resp) => {
+            this.tableAllData = resp;
+            this.total = this.tableAllData.length;
+            this.currentPage = 1;
+            this.tableData = this.pages(
+              this.tableAllData,
+              this.pageSize,
+              this.currentPage - 1
+            );
+            this.$store.commit("getTitleSearchList", this.tableAllData);
+          });
           this.$store.commit("getTitleSearchData", this.input);
         } else {
           this.tableAllData = this.$store.state.titleSearchList;
@@ -142,23 +133,19 @@ export default {
           this.$store.commit("getLabelSearchData", "");
         }
         if (this.$store.state.labelSearchList.length === 0) {
-          axios
-            .get("http://127.0.0.1:5000/search_label", {
-              params: {
-                label: this.input,
-              },
-            })
-            .then((resp) => {
-              this.tableAllData = resp.data;
-              this.total = this.tableAllData.length;
-              this.currentPage = 1;
-              this.tableData = this.pages(
-                this.tableAllData,
-                this.pageSize,
-                this.currentPage - 1
-              );
-              this.$store.commit("getLabelSearchList", this.tableAllData);
-            });
+          searchLabel({
+            label: this.input,
+          }).then((resp) => {
+            this.tableAllData = resp;
+            this.total = this.tableAllData.length;
+            this.currentPage = 1;
+            this.tableData = this.pages(
+              this.tableAllData,
+              this.pageSize,
+              this.currentPage - 1
+            );
+            this.$store.commit("getLabelSearchList", this.tableAllData);
+          });
           this.$store.commit("getLabelSearchData", this.input);
         } else {
           this.tableAllData = this.$store.state.labelSearchList;

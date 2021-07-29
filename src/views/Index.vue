@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { searchHotLabel, searchRandomLabel } from "../api";
 export default {
   name: "Home",
   data() {
@@ -101,14 +101,14 @@ export default {
         params: {
           type: type,
           data: data,
-          state: true
+          state: true,
         },
       });
     },
     handleGetRandomLabel() {
       if (this.$store.state.randomLabelList.length === 0) {
-        axios.get("http://127.0.0.1:5000/search_random_label").then((resp) => {
-          this.randomList = resp.data.map((item) => {
+        searchRandomLabel().then((resp) => {
+          this.randomList = resp.map((item) => {
             return {
               type: item.type,
               len: item.len,
@@ -122,22 +122,18 @@ export default {
     },
     handleGetHotLabel() {
       if (this.$store.state.hotLabelList.length === 0) {
-        axios
-          .get("http://127.0.0.1:5000/search_hot_label", {
-            params: {
-              startNum: 1,
-              endNum: 10,
-            },
-          })
-          .then((resp) => {
-            this.hotList = resp.data.map((item) => {
-              return {
-                type: item.type,
-                len: item.len,
-              };
-            });
-            this.$store.commit("getHotList", this.hotList);
+        searchHotLabel({
+          startNum: 1,
+          endNum: 10,
+        }).then((resp) => {
+          this.hotList = resp.map((item) => {
+            return {
+              type: item.type,
+              len: item.len,
+            };
           });
+          this.$store.commit("getHotList", this.hotList);
+        });
       } else {
         this.hotList = this.$store.state.hotLabelList;
       }
