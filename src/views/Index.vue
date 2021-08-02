@@ -44,7 +44,7 @@
       <el-col :span="15" class="label-title">
         随机标签：
         <el-button
-          @click="handleGetRandomLabel"
+          @click="handleGetRandomLabel(true)"
           icon="el-icon-refresh"
           circle
         ></el-button>
@@ -105,8 +105,8 @@ export default {
         },
       });
     },
-    handleGetRandomLabel() {
-      if (this.$store.state.randomLabelList.length === 0) {
+    handleGetRandomLabel(type) {
+      if (this.$store.state.randomLabelList.length === 0 || type) {
         searchRandomLabel().then((resp) => {
           this.randomList = resp.map((item) => {
             return {
@@ -141,7 +141,7 @@ export default {
   },
   created() {
     this.handleGetHotLabel();
-    this.handleGetRandomLabel();
+    this.handleGetRandomLabel(false);
   },
 };
 </script>
