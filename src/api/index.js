@@ -16,3 +16,10 @@ export function searchRandomLabel() {
     method: "get",
   });
 }
+
+// 测试服务器
+export function testServer() {
+  return request({
+    method: "get",
+  });
+}
