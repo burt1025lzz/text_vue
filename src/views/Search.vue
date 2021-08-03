@@ -24,7 +24,13 @@
     </el-row>
     <el-row class="table" type="flex" justify="center">
       <el-col :span="14">
-        <el-table :data="tableData" height="529" border style="width: 100%">
+        <el-table
+          v-loading="loading"
+          :data="tableData"
+          height="529"
+          border
+          style="width: 100%"
+        >
           <el-table-column prop="title" label="文章标题" min-width="400">
             <template slot-scope="scope">
               <span class="tableItem" @click="handleGoText(scope.row)">{{
@@ -55,6 +61,7 @@
 
 <script>
 import { searchTitle, searchLabel } from "/src/api/search";
+
 export default {
   name: "Search",
   data() {
@@ -66,6 +73,7 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
+      loading: false,
     };
   },
   methods: {
@@ -97,6 +105,7 @@ export default {
       this.input = "";
     },
     handleSearch(type) {
+      this.loading = true;
       if (this.type === "文 章 搜 索") {
         if (type) {
           this.$store.commit("getTitleSearchList", []);
@@ -105,19 +114,25 @@ export default {
         if (this.$store.state.titleSearchList.length === 0) {
           searchTitle({
             title: this.input,
-          }).then((resp) => {
-            this.tableAllData = resp;
-            this.total = this.tableAllData.length;
-            this.currentPage = 1;
-            this.tableData = this.pages(
-              this.tableAllData,
-              this.pageSize,
-              this.currentPage - 1
-            );
-            this.$store.commit("getTitleSearchList", this.tableAllData);
-          });
+          })
+            .then((resp) => {
+              this.loading = false;
+              this.tableAllData = resp;
+              this.total = this.tableAllData.length;
+              this.currentPage = 1;
+              this.tableData = this.pages(
+                this.tableAllData,
+                this.pageSize,
+                this.currentPage - 1
+              );
+              this.$store.commit("getTitleSearchList", this.tableAllData);
+            })
+            .catch(() => {
+              this.loading = false;
+            });
           this.$store.commit("getTitleSearchData", this.input);
         } else {
+          this.loading = false;
           this.tableAllData = this.$store.state.titleSearchList;
           this.total = this.tableAllData.length;
           this.currentPage = this.$store.state.titleSearchCurrentPage;
@@ -135,19 +150,25 @@ export default {
         if (this.$store.state.labelSearchList.length === 0) {
           searchLabel({
             label: this.input,
-          }).then((resp) => {
-            this.tableAllData = resp;
-            this.total = this.tableAllData.length;
-            this.currentPage = 1;
-            this.tableData = this.pages(
-              this.tableAllData,
-              this.pageSize,
-              this.currentPage - 1
-            );
-            this.$store.commit("getLabelSearchList", this.tableAllData);
-          });
+          })
+            .then((resp) => {
+              this.loading = false;
+              this.tableAllData = resp;
+              this.total = this.tableAllData.length;
+              this.currentPage = 1;
+              this.tableData = this.pages(
+                this.tableAllData,
+                this.pageSize,
+                this.currentPage - 1
+              );
+              this.$store.commit("getLabelSearchList", this.tableAllData);
+            })
+            .catch(() => {
+              this.loading = false;
+            });
           this.$store.commit("getLabelSearchData", this.input);
         } else {
+          this.loading = false;
           this.tableAllData = this.$store.state.labelSearchList;
           this.total = this.tableAllData.length;
           this.currentPage = this.$store.state.labelSearchCurrentPage;

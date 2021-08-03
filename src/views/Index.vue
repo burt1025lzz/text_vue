@@ -164,7 +164,6 @@ export default {
       })
       .catch(() => {
         this.server = false;
-        console.log("none");
       });
   },
 };
